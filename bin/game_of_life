@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+require 'curses'
+require File.expand_path('../../lib/game_of_life', __FILE__)
+require File.expand_path('../../lib/game', __FILE__)
+
+def write(line, column, text)
+  Curses.setpos(line, column)
+  Curses.addstr(text);
+end
+
+def init_screen
+  Curses.noecho # do not show typed keys
+  Curses.init_screen
+  begin
+    yield
+  ensure
+    Curses.close_screen
+  end
+end
+
+def display(gol)
+  write 0,0,gol.visual
+end
+
+init_screen do
+  game = Game.new
+  gol = GameOfLife.new game, 'O', '*'
+
+  loop do
+    display gol
+    Curses.refresh
+    sleep 1
+    game.step
+  end
+end
